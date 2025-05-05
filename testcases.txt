@@ -1,0 +1,139 @@
+TEST CASE 1:
+
+SUGOD  
+    MUGNA NUMERO x, y, z=5  
+    MUGNA LETRA a_1='n'  
+    MUGNA TINUOD t="OO"  
+    x=y=4 
+    a_1='c' -- this is a comment 
+    IPAKITA: x & t & z & $ & a_1 & [#] & "last" 
+KATAPUSAN 
+
+
+// Output of the sample program: 
+ 4OO5 
+ c#last
+
+Test Case --------------------------------
+
+
+SUGOD 
+    MUGNA NUMERO xyz, abc=100 
+    xyz= ((abc *5)/10 + 10) * -1 
+    IPAKITA: [[] & xyz & []] 
+KATAPUSAN 
+
+
+// Output of the sample program:  
+[-60] 
+
+
+Test Case --------------------------------
+ 
+
+SUGOD 
+MUGNA NUMERO a=100, b=200, c=300  
+MUGNA TINUOD d="DILI"  
+d = (a < b UG c <> 200) 
+IPAKITA: d 
+KATAPUSAN 
+
+
+// Output of the sample program:  
+OO 
+
+Test Case --------------------------------
+
+
+SUGOD
+  MUGNA TINUOD x = "OO", y = "DILI"
+  IPAKITA: x UG y
+KATAPUSAN
+
+Test Case --------------------------------
+
+
+SUGOD
+  MUGNA NUMERO a=5
+  KUNG (a == 5)
+  PUNDOK {
+    IPAKITA: "YES"
+  }
+KATAPUSAN
+
+
+Test Case --------------------------------
+
+
+SUGOD
+  MUGNA NUMERO a = 10
+  KUNG (a < 5)
+  PUNDOK {
+    IPAKITA: "small"
+  }
+  KUNG WALA
+  PUNDOK {
+    IPAKITA: "big"
+  }
+KATAPUSAN
+
+Test Case --------------------------------
+
+
+SUGOD
+  MUGNA NUMERO i = 0
+  ALANG SA (i = 1, i <= 3, i++)
+  PUNDOK {
+    IPAKITA: i
+  }
+KATAPUSAN
+
+
+Test Case --------------------------------
+
+SUGOD
+MUGNA NUMERO a=5, b=3
+IPAKITA: a + b & $ & a - b & $ & a * b & $ & a / b
+KATAPUSAN
+
+Test Case --------------------------------
+
+
+SUGOD
+MUGNA TINUOD x = OO, y = DILI
+IPAKITA: x UG y & $ & x O y
+KATAPUSAN
+
+Test Case --------------------------------
+
+SUGOD
+MUGNA NUMERO m=10, n=20
+IPAKITA: m < n & $ & m > n & $ & m == n & $ & m <> n
+KATAPUSAN
+
+
+Test Case --------------------------------
+
+
+SUGOD
+MUGNA TINUOD a = OO, b = DILI
+IPAKITA: DILI a & $ & DILI b
+KATAPUSAN
+
+Test Case --------------------------------
+
+SUGOD
+MUGNA TIPIK pi = 3.14, r = 2.0
+IPAKITA: pi * r * r
+KATAPUSAN
+
+
+
+
+
+
+
+
+
+
+
