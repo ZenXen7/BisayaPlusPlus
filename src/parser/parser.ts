@@ -3,40 +3,40 @@ import { Token, TokenType } from "../lexer/tokenizer";
 // === AST Types ===
 
 export type ASTNode =
-  | ProgramNode
-  | DeclarationNode
-  | AssignmentNode
-  | OutputNode
-  | InputNode
+  | ProgramStatementNode
+  | VariableDeclarationNode
+  | VariableAssignmentNode
+  | PrintStatementNode
+  | InputStatementNode
   | IfStatementNode
   | IfElseStatementNode
   | IfElseIfStatementNode
-  | ForLoopNode
-  | BlockNode;
+  | ForLoopStatementNode
+  | CodeBlockNode;
 
-export interface ProgramNode {
+export interface ProgramStatementNode {
   type: "Program";
   body: ASTNode[];
 }
 
-export interface DeclarationNode {
+export interface VariableDeclarationNode {
   type: "Declaration";
   dataType: string;
   identifiers: { name: string; value?: any }[];
 }
 
-export interface AssignmentNode {
+export interface VariableAssignmentNode {
   type: "Assignment";
   targets: string[];
   value: ExpressionNode;
 }
 
-export interface OutputNode {
+export interface PrintStatementNode {
   type: "Output";
   expressions: ExpressionNode[];
 }
 
-export interface InputNode {
+export interface InputStatementNode {
   type: "Input";
   identifiers: string[];
 }
@@ -44,31 +44,31 @@ export interface InputNode {
 export interface IfStatementNode {
   type: "If";
   condition: ExpressionNode;
-  thenBranch: BlockNode;
+  thenBranch: CodeBlockNode;
 }
 
 export interface IfElseStatementNode {
   type: "IfElse";
   condition: ExpressionNode;
-  thenBranch: BlockNode;
-  elseBranch: BlockNode;
+  thenBranch: CodeBlockNode;
+  elseBranch: CodeBlockNode;
 }
 
 export interface IfElseIfStatementNode {
   type: "IfElseIf";
-  branches: { condition: ExpressionNode; body: BlockNode }[];
-  elseBranch: BlockNode;
+  branches: { condition: ExpressionNode; body: CodeBlockNode }[];
+  elseBranch: CodeBlockNode;
 }
 
-export interface ForLoopNode {
+export interface ForLoopStatementNode {
   type: "For";
-  initializer: AssignmentNode;
+  initializer: VariableAssignmentNode;
   condition: ExpressionNode;
-  increment: AssignmentNode;
-  body: BlockNode;
+  increment: VariableAssignmentNode;
+  body: CodeBlockNode;
 }
 
-export interface BlockNode {
+export interface CodeBlockNode {
   type: "Block";
   statements: ASTNode[];
 }
@@ -112,7 +112,7 @@ export class Parser {
     this.tokens = tokens;
   }
 
-  parse(): ProgramNode {
+  parse(): ProgramStatementNode {
     const body: ASTNode[] = [];
 
     this.consumeKeyword("SUGOD");
@@ -144,7 +144,7 @@ export class Parser {
     );
   }
 
-  private parseDeclaration(): DeclarationNode {
+  private parseDeclaration(): VariableDeclarationNode {
     const dataType = this.consume(TokenType.Keyword).value;
     const identifiers = [];
 
@@ -164,7 +164,7 @@ export class Parser {
     };
   }
 
-  private parseAssignment(): AssignmentNode {
+  private parseAssignment(): VariableAssignmentNode {
     const targets = [this.previous().value];
 
     while (this.matchSymbol("=")) {
@@ -183,7 +183,7 @@ export class Parser {
     throw new Error("Invalid assignment statement.");
   }
 
-  private parseOutput(): OutputNode {
+  private parseOutput(): PrintStatementNode {
     this.consumeSymbol(":");
     const expressions: ExpressionNode[] = [];
 
@@ -197,7 +197,7 @@ export class Parser {
     };
   }
 
-  private parseInput(): InputNode {
+  private parseInput(): InputStatementNode {
     this.consumeSymbol(":");
     const identifiers: string[] = [];
 
@@ -213,7 +213,7 @@ export class Parser {
   }
 
   private parseIfStatement(): ASTNode {
-    const branches: { condition: ExpressionNode; body: BlockNode }[] = [];
+    const branches: { condition: ExpressionNode; body: CodeBlockNode }[] = [];
 
     const condition = this.parseExpression();
     const thenBranch = this.parseBlock();
@@ -251,14 +251,14 @@ export class Parser {
     };
   }
 
-  private parseForLoop(): ForLoopNode {
+  private parseForLoop(): ForLoopStatementNode {
     this.consumeKeyword("SA");
     this.consumeSymbol("(");
 
     const initTarget = this.consume(TokenType.Identifier).value;
     this.consumeSymbol("=");
     const initValue = this.parseExpression();
-    const initializer: AssignmentNode = {
+    const initializer: VariableAssignmentNode = {
       type: "Assignment",
       targets: [initTarget],
       value: initValue,
@@ -272,7 +272,7 @@ export class Parser {
 
     const incTarget = this.consume(TokenType.Identifier).value;
     const op = this.consume(TokenType.Symbol).value;
-    const increment: AssignmentNode = {
+    const increment: VariableAssignmentNode = {
       type: "Assignment",
       targets: [incTarget],
       value: {
@@ -296,7 +296,7 @@ export class Parser {
     };
   }
 
-  private parseBlock(): BlockNode {
+  private parseBlock(): CodeBlockNode {
     this.consumeKeyword("PUNDOK");
     this.consumeSymbol("{");
 

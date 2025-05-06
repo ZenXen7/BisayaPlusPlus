@@ -1,12 +1,10 @@
-// src/runtime/interpreter.ts
-
 import {
   ASTNode,
-  ProgramNode,
-  DeclarationNode,
-  AssignmentNode,
-  OutputNode,
-  InputNode,
+  ProgramStatementNode,
+  VariableDeclarationNode,
+  VariableAssignmentNode,
+  PrintStatementNode,
+  InputStatementNode,
   ExpressionNode,
   UnaryExpressionNode,
   BinaryExpressionNode,
@@ -15,8 +13,8 @@ import {
   IfStatementNode,
   IfElseStatementNode,
   IfElseIfStatementNode,
-  ForLoopNode,
-  BlockNode,
+  ForLoopStatementNode,
+  CodeBlockNode,
 } from "../parser/parser";
 
 import { Environment } from "./environment";
@@ -25,7 +23,7 @@ import * as readline from "readline";
 export class Interpreter {
   private env = new Environment();
 
-  async run(node: ProgramNode) {
+  async run(node: ProgramStatementNode) {
     for (const statement of node.body) {
       await this.execute(statement);
     }
@@ -54,7 +52,7 @@ export class Interpreter {
     }
   }
 
-  private defineVariable(node: DeclarationNode) {
+  private defineVariable(node: VariableDeclarationNode) {
     for (const { name, value } of node.identifiers) {
       let evaluated =
         value !== undefined ? value : this.defaultForType(node.dataType);
@@ -62,21 +60,21 @@ export class Interpreter {
     }
   }
 
-  private setVariable(node: AssignmentNode) {
+  private setVariable(node: VariableAssignmentNode) {
     const val = this.evaluateExpression(node.value);
     for (const name of node.targets) {
       this.env.setVariable(name, val);
     }
   }
 
-  private output(node: OutputNode) {
+  private output(node: PrintStatementNode) {
     const values = node.expressions.map((expr) =>
       this.evaluateExpression(expr)
     );
     process.stdout.write(values.join("") + "\n");
   }
 
-  private async input(node: InputNode) {
+  private async input(node: InputStatementNode) {
     const rl = readline.createInterface({
       input: process.stdin,
       output: process.stdout,
@@ -182,7 +180,7 @@ export class Interpreter {
     }
   }
 
-  private async evaluateLoop(node: ForLoopNode) {
+  private async evaluateLoop(node: ForLoopStatementNode) {
     this.setVariable(node.initializer);
     while (this.evaluateExpression(node.condition) === "OO") {
       await this.executeBlock(node.body);
@@ -190,7 +188,7 @@ export class Interpreter {
     }
   }
 
-  private async executeBlock(block: BlockNode) {
+  private async executeBlock(block: CodeBlockNode) {
     for (const stmt of block.statements) {
       await this.execute(stmt);
     }
