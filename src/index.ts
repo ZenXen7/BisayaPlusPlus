@@ -14,8 +14,8 @@ SUGOD
 
   ALANG SA (i=0, i<5, i++)
   PUNDOK{
-    IPAKITA: "BAYOT"
-  }
+    IPAKITA: "GWAPO KO"
+  } 
 KATAPUSAN
 
 `;
