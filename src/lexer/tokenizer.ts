@@ -69,20 +69,17 @@ export function tokenize(input: string): Token[] {
   while (currentPosition < input.length) {
     let currentChar = input[currentPosition];
 
-    // Handle new lineNumbers
     if (currentChar === "\n") {
       lineNumber++;
       currentPosition++;
       continue;
     }
 
-    // Skip whitespace
     if (/\s/.test(currentChar)) {
       currentPosition++;
       continue;
     }
 
-    // Handle comments
     if (currentChar === "-" && input[currentPosition + 1] === "-") {
       while (currentChar !== "\n" && currentPosition < input.length) {
         currentPosition++;
@@ -91,16 +88,13 @@ export function tokenize(input: string): Token[] {
       continue;
     }
 
-    // Handle numbers (integers and floating-point numbers)
     if (/\d/.test(currentChar)) {
       let value = "";
-      // Capture integer part of the number
       while (/\d/.test(currentChar)) {
         value += currentChar;
         currentChar = input[++currentPosition];
       }
 
-      // Check for decimal point and capture fractional part if present
       if (currentChar === ".") {
         value += currentChar;
         currentChar = input[++currentPosition];
@@ -110,12 +104,10 @@ export function tokenize(input: string): Token[] {
         }
       }
 
-      // Push the token for the number
       tokens.push({ type: TokenType.Number, value, lineNumber });
       continue;
     }
 
-    // Handle string literals
     if (currentChar === '"') {
       let value = "";
       currentChar = input[++currentPosition];
@@ -123,20 +115,18 @@ export function tokenize(input: string): Token[] {
         value += currentChar;
         currentChar = input[++currentPosition];
       }
-      currentPosition++; // skip closing "
+      currentPosition++;
       tokens.push({ type: TokenType.String, value, lineNumber });
       continue;
     }
 
-    // Handle character literals
     if (currentChar === "'") {
       const value = input[currentPosition + 1];
-      currentPosition += 3; // skip 'x'
+      currentPosition += 3;
       tokens.push({ type: TokenType.Character, value, lineNumber });
       continue;
     }
 
-    // Handle special escape sequences like [[] and []]
     if (input.startsWith("[[]", currentPosition)) {
       tokens.push({ type: TokenType.Symbol, value: "[[]", lineNumber });
       currentPosition += 3;
@@ -149,7 +139,6 @@ export function tokenize(input: string): Token[] {
       continue;
     }
 
-    // Handle [#] escape
     if (input.startsWith("[#]", currentPosition)) {
       tokens.push({ type: TokenType.Symbol, value: "[#]", lineNumber });
       currentPosition += 3;
@@ -166,10 +155,8 @@ export function tokenize(input: string): Token[] {
       continue;
     }
 
-    // Handle OPERATORS_AND_SYMBOLS/operators
     if (OPERATORS_AND_SYMBOLS.includes(currentChar)) {
       let value = currentChar;
-      // Handle two-character operators like >=, <=, <>
 
       if (
         (currentChar === "<" || currentChar === ">" || currentChar === "=") &&
@@ -187,8 +174,6 @@ export function tokenize(input: string): Token[] {
       continue;
     }
 
-    // Handle identifiers/BISAYA_KEYWORDS
-    // Handle identifiers/BISAYA_KEYWORDS (with lookahead for multi-word BISAYA_KEYWORDS)
     if (/[a-zA-Z_]/.test(currentChar)) {
       let value = "";
       while (
@@ -201,11 +186,9 @@ export function tokenize(input: string): Token[] {
 
       let upperVal = value.toUpperCase();
 
-      // Look ahead to combine with next word if it makes a valid keyword
       const savedPos = currentPosition;
       const savedlineNumber = lineNumber;
 
-      // Skip whitespace
       while (
         /\s/.test(input[currentPosition]) &&
         currentPosition < input.length
@@ -225,7 +208,6 @@ export function tokenize(input: string): Token[] {
       if (BISAYA_KEYWORDS.includes(combined)) {
         upperVal = combined;
       } else {
-        // If not a valid combined keyword, reset position
         currentPosition = savedPos;
         lineNumber = savedlineNumber;
       }

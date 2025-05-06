@@ -75,7 +75,7 @@ export interface CodeBlockNode {
 
 export interface UnaryExpressionNode {
   type: "UnaryExpression";
-  operator: string; // should be 'DILI', '+', or '-'
+  operator: string;
   expression: ExpressionNode;
 }
 
@@ -341,10 +341,9 @@ export class Parser {
   }
 
   private parseUnary(): ExpressionNode {
-    // Handle DILI keyword (NOT)
     if (this.check(TokenType.Keyword) && this.peek().value === "DILI") {
       const operator = this.advance().value;
-      const expression = this.parseUnary(); // recursively call parseUnary
+      const expression = this.parseUnary();
       return {
         type: "UnaryExpression",
         operator,
@@ -352,13 +351,12 @@ export class Parser {
       };
     }
 
-    // Handle unary + or -
     if (
       this.check(TokenType.Symbol) &&
       (this.peek().value === "+" || this.peek().value === "-")
     ) {
       const operator = this.advance().value;
-      const expression = this.parseUnary(); // again, recursively handle nested unary
+      const expression = this.parseUnary();
       return {
         type: "UnaryExpression",
         operator,
@@ -463,12 +461,10 @@ export class Parser {
   private consumeLiteral(): Token {
     const next = this.peek();
 
-    // Handle custom boolean-like literals (OO, DILI)
     if (next.value === "OO" || next.value === "DILI") {
-      return this.advance(); // Treat OO and DILI as valid literals
+      return this.advance();
     }
 
-    // Handle standard literals
     if (
       [
         TokenType.Number,
@@ -477,7 +473,7 @@ export class Parser {
         TokenType.Boolean,
       ].includes(next.type)
     ) {
-      return this.advance(); // Standard literal types
+      return this.advance();
     }
 
     throw new Error(`Expected literal, got '${next.value}'`);

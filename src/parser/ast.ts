@@ -47,13 +47,13 @@ export interface ForLoop {
   body: Statement[];
 }
 
-// Wrapper for expressions used as statements (e.g., `x = 5;`)
+// Wrapper for expressions (e.g., `x = 5;`)
 export interface ExpressionStatement {
   type: "ExpressionStatement";
   expression: Expression;
 }
 
-// ================ Expressions ================
+// ============== Expressions ================
 export type Expression =
   | BinaryExpression
   | UnaryExpression
@@ -76,7 +76,7 @@ export interface LogicalExpression {
   type: "LogicalExpression";
   operator: "UG" | "O" | "DILI";
   left: Expression;
-  right?: Expression; // Optional for "DILI" (unary)
+  right?: Expression;
 }
 
 // Unary operations (+, -)
@@ -92,13 +92,13 @@ export interface Literal {
   value: number | string | boolean;
 }
 
-// Variables (e.g., `x`)
+// Variables
 export interface Identifier {
   type: "Identifier";
   name: string;
 }
 
-// Assignments (e.g., `x = 5`)
+// Assignments
 export interface AssignmentExpression {
   type: "AssignmentExpression";
   left: Identifier;
