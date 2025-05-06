@@ -138,7 +138,9 @@ export class Parser {
     if (this.matchKeyword("ALANG")) return this.parseForLoop();
 
     throw new Error(
-      `Unexpected token '${this.peek().value}' at line ${this.peek().line}`
+      `Unexpected token '${this.peek().value}' at line ${
+        this.peek().lineNumber
+      }`
     );
   }
 

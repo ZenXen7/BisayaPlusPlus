@@ -6,10 +6,15 @@ import { Interpreter } from "./runtime/interpreter";
 
 const test = `
 SUGOD
-  MUGNA NUMERO a=5
+  MUGNA NUMERO a=5, i
   KUNG (a == 5)
   PUNDOK {
     IPAKITA: "YES"
+  }
+
+  ALANG SA (i=0, i<5, i++)
+  PUNDOK{
+    IPAKITA: "BAYOT"
   }
 KATAPUSAN
 

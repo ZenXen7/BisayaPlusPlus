@@ -1,4 +1,3 @@
-// Base types
 export type ASTNode = Statement | Expression;
 
 // ================ Statements ================

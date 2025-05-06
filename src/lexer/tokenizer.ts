@@ -1,5 +1,3 @@
-// src/lexer/tokenizer.ts
-
 export enum TokenType {
   Keyword,
   Identifier,
@@ -16,10 +14,10 @@ export enum TokenType {
 export interface Token {
   type: TokenType;
   value: string;
-  line: number;
+  lineNumber: number;
 }
 
-const KEYWORDS = [
+const BISAYA_KEYWORDS = [
   "SUGOD",
   "KATAPUSAN",
   "MUGNA",
@@ -40,7 +38,7 @@ const KEYWORDS = [
   "DILI",
 ];
 
-const SYMBOLS = [
+const OPERATORS_AND_SYMBOLS = [
   "(",
   ")",
   "{",
@@ -65,178 +63,189 @@ const SYMBOLS = [
 
 export function tokenize(input: string): Token[] {
   const tokens: Token[] = [];
-  let current = 0;
-  let line = 1;
+  let currentPosition = 0;
+  let lineNumber = 1;
 
-  while (current < input.length) {
-    let char = input[current];
+  while (currentPosition < input.length) {
+    let currentChar = input[currentPosition];
 
-    // Handle new lines
-    if (char === "\n") {
-      line++;
-      current++;
+    // Handle new lineNumbers
+    if (currentChar === "\n") {
+      lineNumber++;
+      currentPosition++;
       continue;
     }
 
     // Skip whitespace
-    if (/\s/.test(char)) {
-      current++;
+    if (/\s/.test(currentChar)) {
+      currentPosition++;
       continue;
     }
 
     // Handle comments
-    if (char === "-" && input[current + 1] === "-") {
-      while (char !== "\n" && current < input.length) {
-        current++;
-        char = input[current];
+    if (currentChar === "-" && input[currentPosition + 1] === "-") {
+      while (currentChar !== "\n" && currentPosition < input.length) {
+        currentPosition++;
+        currentChar = input[currentPosition];
       }
       continue;
     }
 
     // Handle numbers (integers and floating-point numbers)
-    if (/\d/.test(char)) {
+    if (/\d/.test(currentChar)) {
       let value = "";
       // Capture integer part of the number
-      while (/\d/.test(char)) {
-        value += char;
-        char = input[++current];
+      while (/\d/.test(currentChar)) {
+        value += currentChar;
+        currentChar = input[++currentPosition];
       }
 
       // Check for decimal point and capture fractional part if present
-      if (char === ".") {
-        value += char;
-        char = input[++current];
-        while (/\d/.test(char)) {
-          value += char;
-          char = input[++current];
+      if (currentChar === ".") {
+        value += currentChar;
+        currentChar = input[++currentPosition];
+        while (/\d/.test(currentChar)) {
+          value += currentChar;
+          currentChar = input[++currentPosition];
         }
       }
 
       // Push the token for the number
-      tokens.push({ type: TokenType.Number, value, line });
+      tokens.push({ type: TokenType.Number, value, lineNumber });
       continue;
     }
 
     // Handle string literals
-    if (char === '"') {
+    if (currentChar === '"') {
       let value = "";
-      char = input[++current];
-      while (char !== '"' && current < input.length) {
-        value += char;
-        char = input[++current];
+      currentChar = input[++currentPosition];
+      while (currentChar !== '"' && currentPosition < input.length) {
+        value += currentChar;
+        currentChar = input[++currentPosition];
       }
-      current++; // skip closing "
-      tokens.push({ type: TokenType.String, value, line });
+      currentPosition++; // skip closing "
+      tokens.push({ type: TokenType.String, value, lineNumber });
       continue;
     }
 
     // Handle character literals
-    if (char === "'") {
-      const value = input[current + 1];
-      current += 3; // skip 'x'
-      tokens.push({ type: TokenType.Character, value, line });
+    if (currentChar === "'") {
+      const value = input[currentPosition + 1];
+      currentPosition += 3; // skip 'x'
+      tokens.push({ type: TokenType.Character, value, lineNumber });
       continue;
     }
 
     // Handle special escape sequences like [[] and []]
-    if (input.startsWith("[[]", current)) {
-      tokens.push({ type: TokenType.Symbol, value: "[[]", line });
-      current += 3;
+    if (input.startsWith("[[]", currentPosition)) {
+      tokens.push({ type: TokenType.Symbol, value: "[[]", lineNumber });
+      currentPosition += 3;
       continue;
     }
 
-    if (input.startsWith("[]]", current)) {
-      tokens.push({ type: TokenType.Symbol, value: "[]]", line });
-      current += 3;
+    if (input.startsWith("[]]", currentPosition)) {
+      tokens.push({ type: TokenType.Symbol, value: "[]]", lineNumber });
+      currentPosition += 3;
       continue;
     }
 
     // Handle [#] escape
-    if (input.startsWith("[#]", current)) {
-      tokens.push({ type: TokenType.Symbol, value: "[#]", line });
-      current += 3;
+    if (input.startsWith("[#]", currentPosition)) {
+      tokens.push({ type: TokenType.Symbol, value: "[#]", lineNumber });
+      currentPosition += 3;
       continue;
     }
 
-    if ((char === "+" || char === "-") && input[current + 1] === char) {
-      const doubleOp = char + input[current + 1];
-      tokens.push({ type: TokenType.Symbol, value: doubleOp, line });
-      current += 2;
+    if (
+      (currentChar === "+" || currentChar === "-") &&
+      input[currentPosition + 1] === currentChar
+    ) {
+      const doubleOp = currentChar + input[currentPosition + 1];
+      tokens.push({ type: TokenType.Symbol, value: doubleOp, lineNumber });
+      currentPosition += 2;
       continue;
     }
 
-    // Handle symbols/operators
-    if (SYMBOLS.includes(char)) {
-      let value = char;
+    // Handle OPERATORS_AND_SYMBOLS/operators
+    if (OPERATORS_AND_SYMBOLS.includes(currentChar)) {
+      let value = currentChar;
       // Handle two-character operators like >=, <=, <>
 
       if (
-        (char === "<" || char === ">" || char === "=") &&
-        input[current + 1] === "="
+        (currentChar === "<" || currentChar === ">" || currentChar === "=") &&
+        input[currentPosition + 1] === "="
       ) {
-        value += input[current + 1];
-        current++;
-      } else if (char === "<" && input[current + 1] === ">") {
-        value += input[current + 1];
-        current++;
+        value += input[currentPosition + 1];
+        currentPosition++;
+      } else if (currentChar === "<" && input[currentPosition + 1] === ">") {
+        value += input[currentPosition + 1];
+        currentPosition++;
       }
 
-      current++;
-      tokens.push({ type: TokenType.Symbol, value, line });
+      currentPosition++;
+      tokens.push({ type: TokenType.Symbol, value, lineNumber });
       continue;
     }
 
-    // Handle identifiers/keywords
-    // Handle identifiers/keywords (with lookahead for multi-word keywords)
-    if (/[a-zA-Z_]/.test(char)) {
+    // Handle identifiers/BISAYA_KEYWORDS
+    // Handle identifiers/BISAYA_KEYWORDS (with lookahead for multi-word BISAYA_KEYWORDS)
+    if (/[a-zA-Z_]/.test(currentChar)) {
       let value = "";
-      while (/[a-zA-Z0-9_]/.test(char) && current < input.length) {
-        value += char;
-        char = input[++current];
+      while (
+        /[a-zA-Z0-9_]/.test(currentChar) &&
+        currentPosition < input.length
+      ) {
+        value += currentChar;
+        currentChar = input[++currentPosition];
       }
 
       let upperVal = value.toUpperCase();
 
       // Look ahead to combine with next word if it makes a valid keyword
-      const savedPos = current;
-      const savedLine = line;
+      const savedPos = currentPosition;
+      const savedlineNumber = lineNumber;
 
       // Skip whitespace
-      while (/\s/.test(input[current]) && current < input.length) {
-        if (input[current] === "\n") line++;
-        current++;
+      while (
+        /\s/.test(input[currentPosition]) &&
+        currentPosition < input.length
+      ) {
+        if (input[currentPosition] === "\n") lineNumber++;
+        currentPosition++;
       }
 
       let nextWord = "";
-      let nextChar = input[current];
-      while (/[a-zA-Z]/.test(nextChar) && current < input.length) {
+      let nextChar = input[currentPosition];
+      while (/[a-zA-Z]/.test(nextChar) && currentPosition < input.length) {
         nextWord += nextChar;
-        nextChar = input[++current];
+        nextChar = input[++currentPosition];
       }
 
       const combined = `${upperVal} ${nextWord.toUpperCase()}`;
-      if (KEYWORDS.includes(combined)) {
+      if (BISAYA_KEYWORDS.includes(combined)) {
         upperVal = combined;
       } else {
         // If not a valid combined keyword, reset position
-        current = savedPos;
-        line = savedLine;
+        currentPosition = savedPos;
+        lineNumber = savedlineNumber;
       }
 
-      if (KEYWORDS.includes(upperVal)) {
-        tokens.push({ type: TokenType.Keyword, value: upperVal, line });
+      if (BISAYA_KEYWORDS.includes(upperVal)) {
+        tokens.push({ type: TokenType.Keyword, value: upperVal, lineNumber });
       } else if (upperVal === "OO" || upperVal === "DILI") {
-        tokens.push({ type: TokenType.Boolean, value: upperVal, line });
+        tokens.push({ type: TokenType.Boolean, value: upperVal, lineNumber });
       } else {
-        tokens.push({ type: TokenType.Identifier, value: value, line });
+        tokens.push({ type: TokenType.Identifier, value: value, lineNumber });
       }
 
       continue;
     }
 
-    throw new Error(`Unexpected character '${char}' at line ${line}`);
+    throw new Error(
+      `Unexpected character '${currentChar}' at lineNumber ${lineNumber}`
+    );
   }
 
-  tokens.push({ type: TokenType.Eof, value: "EOF", line });
+  tokens.push({ type: TokenType.Eof, value: "EOF", lineNumber });
   return tokens;
 }

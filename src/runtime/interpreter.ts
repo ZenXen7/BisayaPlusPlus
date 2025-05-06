@@ -34,9 +34,9 @@ export class Interpreter {
   private async execute(node: ASTNode): Promise<any> {
     switch (node.type) {
       case "Declaration":
-        return this.declare(node);
+        return this.defineVariable(node);
       case "Assignment":
-        return this.assign(node);
+        return this.setVariable(node);
       case "Output":
         return this.output(node);
       case "Input":
@@ -54,18 +54,18 @@ export class Interpreter {
     }
   }
 
-  private declare(node: DeclarationNode) {
+  private defineVariable(node: DeclarationNode) {
     for (const { name, value } of node.identifiers) {
       let evaluated =
         value !== undefined ? value : this.defaultForType(node.dataType);
-      this.env.declare(name, evaluated);
+      this.env.defineVariable(name, evaluated);
     }
   }
 
-  private assign(node: AssignmentNode) {
+  private setVariable(node: AssignmentNode) {
     const val = this.evaluateExpression(node.value);
     for (const name of node.targets) {
-      this.env.assign(name, val);
+      this.env.setVariable(name, val);
     }
   }
 
@@ -89,7 +89,7 @@ export class Interpreter {
         node.identifiers.forEach((name, i) => {
           const raw = values[i];
           const parsed = /^\d+$/.test(raw) ? parseInt(raw) : raw;
-          this.env.assign(name, parsed);
+          this.env.setVariable(name, parsed);
         });
         rl.close();
         resolve(true);
@@ -102,7 +102,7 @@ export class Interpreter {
       case "Literal":
         return expr.value;
       case "Identifier":
-        return this.env.get(expr.name);
+        return this.env.getVariable(expr.name);
       case "UnaryExpression": {
         const value = this.evaluateExpression(expr.expression);
         switch (expr.operator) {
@@ -183,10 +183,10 @@ export class Interpreter {
   }
 
   private async evaluateLoop(node: ForLoopNode) {
-    this.assign(node.initializer);
+    this.setVariable(node.initializer);
     while (this.evaluateExpression(node.condition) === "OO") {
       await this.executeBlock(node.body);
-      this.assign(node.increment);
+      this.setVariable(node.increment);
     }
   }
 

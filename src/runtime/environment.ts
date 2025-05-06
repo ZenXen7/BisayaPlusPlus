@@ -3,28 +3,32 @@
 export class Environment {
   private variables = new Map<string, any>();
 
-  declare(name: string, value: any) {
+  defineVariable(name: string, value: any) {
+    //declare
     if (this.variables.has(name)) {
       throw new Error(`Variable '${name}' already declared.`);
     }
     this.variables.set(name, value);
   }
 
-  assign(name: string, value: any) {
+  setVariable(name: string, value: any) {
+    //assign
     if (!this.variables.has(name)) {
-      throw new Error(`Variable '${name}' not declared.`);
+      throw new Error(`Variable ${name} not declared.`);
     }
     this.variables.set(name, value);
   }
 
-  get(name: string): any {
+  getVariable(name: string): any {
+    //get
     if (!this.variables.has(name)) {
-      throw new Error(`Variable '${name}' not found.`);
+      throw new Error(`Variable ${name} not found.`);
     }
     return this.variables.get(name);
   }
 
-  has(name: string): boolean {
+  hasVariable(name: string): boolean {
+    //has
     return this.variables.has(name);
   }
 }
